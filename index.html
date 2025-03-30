@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital Health Strategist Challenge</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            line-height: 1.6;
+            padding: 20px;
+            background-color: #f4f7f6;
+            color: #333;
+        }
+        #quiz-container {
+            max-width: 600px;
+            margin: auto;
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1, h2 {
+            text-align: center;
+            color: #0056b3; /* A slightly professional blue */
+        }
+        #question-text {
+            font-size: 1.1em;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+        .options button {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            background-color: #eee;
+            color: #333;
+            text-align: left;
+            font-size: 1em;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+        .options button:hover {
+            background-color: #ddd;
+        }
+        .options button:disabled {
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+        #feedback {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .correct {
+            background-color: #d4edda; /* Light green */
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .incorrect {
+            background-color: #f8d7da; /* Light red */
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        #next-button {
+            display: none; /* Hidden initially */
+            padding: 10px 20px;
+            margin-top: 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            float: right; /* Position to the right */
+        }
+        #next-button:hover {
+            background-color: #0056b3;
+        }
+        #results {
+            text-align: center;
+            font-size: 1.2em;
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+    <div id="quiz-container">
+        <h1>Digital Health Strategist Challenge</h1>
+        <div id="quiz-content">
+            <div id="question-area">
+                <div id="question-text"></div>
+                <div class="options" id="options-container">
+                    <!-- Buttons will be generated here -->
+                </div>
+            </div>
+            <div id="feedback"></div>
+            <button id="next-button">Next Question</button>
+        </div>
+        <div id="results" style="display: none;">
+            <h2>Quiz Complete!</h2>
+            <p id="score"></p>
+            <p>Great job reviewing the financial concepts!</p>
+        </div>
+    </div>
+
+    <script>
+        const quizData = [
+            {
+                question: "A startup offers a mental wellness app directly to consumers via a monthly payment for full access. What is its PRIMARY revenue model?",
+                options: ["B2B Contract", "DTC Subscription", "Insurance Reimbursement", "Freemium (as primary)"],
+                correctAnswerIndex: 1,
+                feedback: "Correct! Selling directly to users with recurring payments is a Direct-to-Consumer (DTC) Subscription model."
+            },
+            {
+                question: "A company emphasizes that its remote monitoring platform saves hospitals $500 per patient annually by reducing readmissions. They set their price based on capturing a portion of these savings. What is the main DRIVER of their pricing strategy?",
+                options: ["Cost-Plus", "Competitive Pressure", "Value-Based", "Regulatory Limits"],
+                correctAnswerIndex: 2,
+                feedback: "Correct! Pricing based on the demonstrated savings or value delivered to the customer is Value-Based pricing."
+            },
+            {
+                question: "For a telehealth platform, the cost paid to specialist doctors for *each* consultation performed is typically considered what type of cost?",
+                options: ["Fixed Cost", "Variable Cost", "Capital Expenditure", "Marketing Cost"],
+                correctAnswerIndex: 1,
+                feedback: "Correct! Costs that change directly with the volume of service delivered (like per-consult payments) are Variable Costs."
+            }
+            // Add more questions here if desired
+        ];
+
+        const quizContainer = document.getElementById('quiz-container');
+        const quizContent = document.getElementById('quiz-content');
+        const questionArea = document.getElementById('question-area');
+        const questionText = document.getElementById('question-text');
+        const optionsContainer = document.getElementById('options-container');
+        const feedbackDiv = document.getElementById('feedback');
+        const nextButton = document.getElementById('next-button');
+        const resultsDiv = document.getElementById('results');
+        const scoreP = document.getElementById('score');
+
+        let currentQuestionIndex = 0;
+        let score = 0;
+
+        function loadQuestion() {
+            feedbackDiv.innerHTML = ''; // Clear previous feedback
+            feedbackDiv.className = ''; // Reset feedback class
+            nextButton.style.display = 'none'; // Hide next button
+
+            const currentQuestion = quizData[currentQuestionIndex];
+            questionText.textContent = `Question ${currentQuestionIndex + 1}: ${currentQuestion.question}`;
+
+            optionsContainer.innerHTML = ''; // Clear previous options
+            currentQuestion.options.forEach((option, index) => {
+                const button = document.createElement('button');
+                button.textContent = option;
+                button.onclick = () => selectAnswer(index);
+                optionsContainer.appendChild(button);
+            });
+        }
+
+        function selectAnswer(selectedIndex) {
+            const currentQuestion = quizData[currentQuestionIndex];
+            const buttons = optionsContainer.getElementsByTagName('button');
+
+            // Disable all buttons after an answer is selected
+            for (let button of buttons) {
+                button.disabled = true;
+            }
+
+            if (selectedIndex === currentQuestion.correctAnswerIndex) {
+                score++;
+                feedbackDiv.textContent = currentQuestion.feedback;
+                feedbackDiv.className = 'correct';
+                buttons[selectedIndex].style.backgroundColor = '#c3e6cb'; // Highlight correct answer green
+            } else {
+                feedbackDiv.textContent = `Not quite. ${currentQuestion.feedback}`;
+                feedbackDiv.className = 'incorrect';
+                buttons[selectedIndex].style.backgroundColor = '#f5c6cb'; // Highlight incorrect answer red
+                // Optionally highlight the correct answer too
+                buttons[currentQuestion.correctAnswerIndex].style.backgroundColor = '#c3e6cb';
+            }
+
+            // Show the next button
+            if (currentQuestionIndex < quizData.length - 1) {
+                nextButton.style.display = 'block';
+            } else {
+                // Last question, show results
+                showResults();
+            }
+        }
+
+        function showResults() {
+            quizContent.style.display = 'none'; // Hide quiz area
+            resultsDiv.style.display = 'block'; // Show results area
+            scoreP.textContent = `Your Score: ${score} out of ${quizData.length}`;
+        }
+
+        nextButton.onclick = () => {
+            currentQuestionIndex++;
+            loadQuestion();
+        };
+
+        // Initial load
+        loadQuestion();
+    </script>
+</body>
+</html>
