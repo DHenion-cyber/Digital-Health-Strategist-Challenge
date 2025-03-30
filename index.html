@@ -68,15 +68,27 @@
         }
         #next-button {
             display: none; /* Hidden initially */
-            padding: 10px 20px;
-            margin-top: 20px;
+            padding: 15px 30px;
+            margin-top: 30px;
+            margin-bottom: 20px;
             background-color: #007bff;
             color: white;
             border: none;
-            border-radius: 5px;
+            border-radius: 8px;
             cursor: pointer;
-            font-size: 1em;
-            float: right; /* Position to the right */
+            font-size: 1.2em;
+            font-weight: bold;
+            width: 200px;
+            margin-left: auto;
+            margin-right: auto;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            transition: background-color 0.3s, transform 0.2s;
+        }
+        
+        #next-button:hover {
+            background-color: #0056b3;
+            transform: translateY(-2px);
         }
         #next-button:hover {
             background-color: #0056b3;
@@ -186,6 +198,8 @@
             // Show the next button
             if (currentQuestionIndex < quizData.length - 1) {
                 nextButton.style.display = 'block';
+                // Scroll to make sure the button is visible
+                nextButton.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
             } else {
                 // Last question, show results
                 showResults();
