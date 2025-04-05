@@ -66,7 +66,7 @@
             color: #721c24;
             border: 1px solid #f5c6cb;
         }
-        #next-button {
+        #next-button, #prev-button {
             display: none; /* Hidden initially */
             padding: 15px 30px;
             margin-top: 30px;
@@ -79,14 +79,19 @@
             font-size: 1.2em;
             font-weight: bold;
             width: 200px;
-            margin-left: auto;
-            margin-right: auto;
             text-align: center;
             box-shadow: 0 4px 8px rgba(0,0,0,0.1);
             transition: background-color 0.3s, transform 0.2s;
         }
         
-        #next-button:hover {
+        #navigation-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin: 0 auto;
+            max-width: 450px;
+        }
+        
+        #next-button:hover, #prev-button:hover {
             background-color: #0056b3;
             transform: translateY(-2px);
         }
@@ -111,7 +116,10 @@
                 </div>
             </div>
             <div id="feedback"></div>
-            <button id="next-button">Next Question</button>
+            <div id="navigation-buttons">
+                <button id="prev-button">Previous Question</button>
+                <button id="next-button">Next Question</button>
+            </div>
         </div>
         <div id="results" style="display: none;">
             <h2>Quiz Complete!</h2>
@@ -150,6 +158,7 @@
         const optionsContainer = document.getElementById('options-container');
         const feedbackDiv = document.getElementById('feedback');
         const nextButton = document.getElementById('next-button');
+        const prevButton = document.getElementById('prev-button');
         const resultsDiv = document.getElementById('results');
         const scoreP = document.getElementById('score');
 
@@ -160,6 +169,13 @@
             feedbackDiv.innerHTML = ''; // Clear previous feedback
             feedbackDiv.className = ''; // Reset feedback class
             nextButton.style.display = 'none'; // Hide next button
+            
+            // Show/hide prev button based on question index
+            if (currentQuestionIndex > 0) {
+                prevButton.style.display = 'block';
+            } else {
+                prevButton.style.display = 'none';
+            }
 
             const currentQuestion = quizData[currentQuestionIndex];
             questionText.textContent = `Question ${currentQuestionIndex + 1}: ${currentQuestion.question}`;
@@ -188,17 +204,19 @@
                 feedbackDiv.className = 'correct';
                 buttons[selectedIndex].style.backgroundColor = '#c3e6cb'; // Highlight correct answer green
             } else {
-                feedbackDiv.textContent = `Not quite. ${currentQuestion.feedback}`;
+                // Remove "Correct!" from the feedback for wrong answers
+                let wrongFeedback = currentQuestion.feedback.replace("Correct! ", "");
+                feedbackDiv.textContent = `Not quite. ${wrongFeedback}`;
                 feedbackDiv.className = 'incorrect';
                 buttons[selectedIndex].style.backgroundColor = '#f5c6cb'; // Highlight incorrect answer red
                 // Optionally highlight the correct answer too
                 buttons[currentQuestion.correctAnswerIndex].style.backgroundColor = '#c3e6cb';
             }
 
-            // Show the next button
+            // Show navigation buttons
             if (currentQuestionIndex < quizData.length - 1) {
                 nextButton.style.display = 'block';
-                // Scroll to make sure the button is visible
+                // Scroll to make sure the buttons are visible
                 nextButton.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
             } else {
                 // Last question, show results
@@ -215,6 +233,13 @@
         nextButton.onclick = () => {
             currentQuestionIndex++;
             loadQuestion();
+        };
+        
+        prevButton.onclick = () => {
+            if (currentQuestionIndex > 0) {
+                currentQuestionIndex--;
+                loadQuestion();
+            }
         };
 
         // Initial load
